@@ -28,12 +28,12 @@ class IkomiaPlugin(dataprocess.CPluginProcessInterface):
     def __init__(self):
         dataprocess.CPluginProcessInterface.__init__(self)
 
-    def getProcessFactory(self):
+    def get_process_factory(self):
         # Instantiate process object
         from train_detectron2_instance_segmentation.train_detectron2_instance_segmentation_process import TrainDetectron2InstanceSegmentationFactory
         return TrainDetectron2InstanceSegmentationFactory()
 
-    def getWidgetFactory(self):
+    def get_widget_factory(self):
         # Instantiate associated widget object
         from train_detectron2_instance_segmentation.train_detectron2_instance_segmentation_widget import TrainDetectron2InstanceSegmentationWidgetFactory
         return TrainDetectron2InstanceSegmentationWidgetFactory()

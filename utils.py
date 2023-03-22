@@ -189,19 +189,8 @@ class MyMapper(DatasetMapper):
         dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
         # can use other ways to read image
         image = utils.read_image(dataset_dict["file_name"], format="BGR")
-        """vis = Visualizer(image)
-        print("OK")
-        cv2.imwrite("/home/ambroise/Ikomia/Plugins/Python/train_detectron2_instance_segmentation/truc.png",vis.draw_dataset_dict(dataset_dict).get_image())
-        raise ValueError"""
-        if "semantic_seg_masks_file" in dataset_dict:
-            if "category_colors" in dataset_dict:
-                sem_seg_gt = utils.read_image(dataset_dict.pop("semantic_seg_masks_file"), "RGB")
-                sem_seg_gt = rgb2mask(sem_seg_gt, dataset_dict["category_colors"])
-            else:
-                sem_seg_gt = utils.read_image(dataset_dict.pop("semantic_seg_masks_file"), "L")
-                sem_seg_gt = sem_seg_gt.squeeze(2)
-        else:
-            print("Incompatible dataset")
+
+        sem_seg_gt = None
 
         aug_input = T.AugInput(image, sem_seg=sem_seg_gt)
         transforms = self.augmentations(aug_input)
@@ -212,14 +201,6 @@ class MyMapper(DatasetMapper):
         # but not efficient on large generic data structures due to the use of pickle & mp.Queue.
         # Therefore it's important to use torch.Tensor.
         dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
-        if sem_seg_gt is not None:
-            dataset_dict["sem_seg"] = torch.as_tensor(sem_seg_gt.astype("long"))
-
-        if not self.is_train:
-            # USER: Modify this if you want to keep them for some reason.
-            dataset_dict.pop("annotations", None)
-            dataset_dict.pop("sem_seg_file_name", None)
-            return dataset_dict
 
         if "annotations" in dataset_dict:
             self._transform_annotations(dataset_dict, transforms, image_shape)

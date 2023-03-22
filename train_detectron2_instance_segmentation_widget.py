@@ -106,7 +106,7 @@ class TrainDetectron2InstanceSegmentationWidget(core.CWorkflowTaskWidget):
         layout_ptr = qtconversion.PyQtToQt(self.gridLayout)
 
         # Set widget layout
-        self.setLayout(layout_ptr)
+        self.set_layout(layout_ptr)
 
     def on_check(self, int):
         self.slider_split.setEnabled(not self.check_custom_cfg.isChecked())
@@ -120,7 +120,7 @@ class TrainDetectron2InstanceSegmentationWidget(core.CWorkflowTaskWidget):
         self.spin_eval_period.setEnabled(not self.check_custom_cfg.isChecked())
         self.browse_custom_cfg.setEnabled(self.check_custom_cfg.isChecked())
 
-    def onApply(self):
+    def on_apply(self):
         # Apply button clicked slot
 
         # Get parameters from widget
@@ -138,7 +138,7 @@ class TrainDetectron2InstanceSegmentationWidget(core.CWorkflowTaskWidget):
         self.parameters.cfg["eval_period"] = self.spin_eval_period.value()
 
         # Send signal to launch the process
-        self.emitApply(self.parameters)
+        self.emit_apply(self.parameters)
 
 
 # --------------------

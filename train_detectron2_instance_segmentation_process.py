@@ -34,6 +34,7 @@ from detectron2.config import get_cfg, CfgNode
 from detectron2.data import MetadataCatalog
 from train_detectron2_instance_segmentation.utils import MyMapper, MyTrainer, register_datasets
 import gc
+from ikomia.core import config as ikcfg
 
 
 # --------------------
@@ -58,7 +59,7 @@ class TrainDetectron2InstanceSegmentationParam(TaskParam):
         self.cfg["split_train_test"] = 0.8
         self.cfg["eval_period"] = 50
 
-    def setParamMap(self, param_map):
+    def set_values(self, param_map):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
         # Example : self.windowSize = int(param_map["windowSize"])
@@ -74,10 +75,10 @@ class TrainDetectron2InstanceSegmentationParam(TaskParam):
         self.cfg["split_train_test"] = float(param_map["split_train_test"])
         self.cfg["eval_period"] = int(param_map["eval_period"])
 
-    def getParamMap(self):
+    def get_values(self):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
-        param_map = core.ParamMap()
+        param_map = {}
         # Example : paramMap["windowSize"] = str(self.windowSize)
         param_map["model_name"] = self.cfg["model_name"]
         param_map["custom_cfg"] = str(self.cfg["custom_cfg"])
@@ -102,16 +103,16 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
     def __init__(self, name, param):
         dnntrain.TrainProcess.__init__(self, name, param)
         # Add input/output of the process here
-        # Example :  self.addInput(dataprocess.CImageIO())
-        #           self.addOutput(dataprocess.CImageIO())
+        # Example :  self.add_input(dataprocess.CImageIO())
+        #           self.add_output(dataprocess.CImageIO())
 
         # Create parameters class
         if param is None:
-            self.setParam(TrainDetectron2InstanceSegmentationParam())
+            self.set_param_object(TrainDetectron2InstanceSegmentationParam())
         else:
-            self.setParam(copy.deepcopy(param))
+            self.set_param_object(copy.deepcopy(param))
 
-    def getProgressSteps(self, eltCount=1):
+    def get_progress_steps(self, eltCount=1):
         # Function returning the number of progress steps for this process
         # This is handled by the main progress bar of Ikomia application
         return 100
@@ -120,18 +121,18 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
         self.epochs_done += 1
         steps = range(self.advancement, int(100 * self.epochs_done / self.epochs_todo))
         for step in steps:
-            self.emitStepProgress()
+            self.emit_step_progress()
             self.advancement += 1
 
     def run(self):
         # Core function of your process
-        # Call beginTaskRun for initialization
-        self.beginTaskRun()
+        # Call begin_task_run for initialization
+        self.begin_task_run()
         self.stop_train = False
         gc.collect()
         torch.cuda.empty_cache()
 
-        ik_dataset = self.getInput(0)
+        ik_dataset = self.get_input(0)
         had_bckgnd_class = ik_dataset.has_bckgnd_class
         metadata = copy.deepcopy(ik_dataset.data["metadata"]["category_names"])
         images = copy.deepcopy(ik_dataset.data["images"])
@@ -143,9 +144,9 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
 
         str_datetime = datetime.now().strftime("%d-%m-%YT%Hh%Mm%Ss")
         # Get parameters :
-        param = self.getParam()
+        param = self.get_param_object()
 
-        tb_logdir = self.getTensorboardLogDir() + "/" + param.cfg["model_name"] + "/" + str_datetime
+        tb_logdir = os.path.join(ikcfg.main_cfg["tensorboard"]["log_uri"], str_datetime)
 
         if not param.cfg["custom_cfg"]:
             out_dir = param.cfg["output_folder"] + "/" + str_datetime
@@ -175,7 +176,7 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
                     out_dir = cfg.OUTPUT_DIR
             else:
                 print("Unable to load config file {}".format(param.cfg["cfg_path"]))
-                self.endTaskRun()
+                self.end_task_run()
 
         os.makedirs(out_dir, exist_ok=True)
 
@@ -199,8 +200,8 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
         del trainer
         gc.collect()
         torch.cuda.empty_cache()
-        # Call endTaskRun to finalize process
-        self.endTaskRun()
+        # Call end_task_run to finalize process
+        self.end_task_run()
 
     def get_stop_train(self):
         return self.stop_train
@@ -220,19 +221,19 @@ class TrainDetectron2InstanceSegmentationFactory(dataprocess.CTaskFactory):
         dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
         self.info.name = "train_detectron2_instance_segmentation"
-        self.info.shortDescription = "Train Detectron2 instance segmentation models"
+        self.info.short_description = "Train Detectron2 instance segmentation models"
         self.info.description = "Train Detectron2 instance segmentation models"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
         self.info.version = "1.0.0"
-        self.info.iconPath = "icons/detectron2.png"
+        self.info.icon_path = "icons/detectron2.png"
         self.info.authors = "Yuxin Wu, Alexander Kirillov, Francisco Massa, Wan-Yen Lo, Ross Girshick"
         self.info.article = "Detectron2"
         self.info.journal = ""
         self.info.year = 2019
         self.info.license = "Apache License 2.0"
         # URL of documentation
-        self.info.documentationLink = "https://detectron2.readthedocs.io/en/latest/"
+        self.info.documentation_link = "https://detectron2.readthedocs.io/en/latest/"
         # Code source repository
         self.info.repository = "https://github.com/facebookresearch/detectron2"
         # Keywords used for search
