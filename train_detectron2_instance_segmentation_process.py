@@ -49,7 +49,7 @@ class TrainDetectron2InstanceSegmentationParam(TaskParam):
         # Example : self.windowSize = 25
         self.cfg["model_name"] = "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x"
         self.cfg["use_custom_cfg"] = False
-        self.cfg["config"] = ""
+        self.cfg["config_file"] = ""
         self.cfg["max_iter"] = 100
         self.cfg["batch_size"] = 2
         self.cfg["input_size"] = 400
@@ -65,7 +65,7 @@ class TrainDetectron2InstanceSegmentationParam(TaskParam):
         # Example : self.windowSize = int(param_map["windowSize"])
         self.cfg["model_name"] = param_map["model_name"]
         self.cfg["use_custom_cfg"] = eval(param_map["use_custom_cfg"])
-        self.cfg["config"] = param_map["config"]
+        self.cfg["config_file"] = param_map["config_file"]
         self.cfg["max_iter"] = int(param_map["max_iter"])
         self.cfg["batch_size"] = int(param_map["batch_size"])
         self.cfg["input_size"] = int(param_map["input_size"])
@@ -82,7 +82,7 @@ class TrainDetectron2InstanceSegmentationParam(TaskParam):
         # Example : paramMap["windowSize"] = str(self.windowSize)
         param_map["model_name"] = self.cfg["model_name"]
         param_map["use_custom_cfg"] = str(self.cfg["use_custom_cfg"])
-        param_map["config"] = self.cfg["config"]
+        param_map["config_file"] = self.cfg["config_file"]
         param_map["max_iter"] = str(self.cfg["max_iter"])
         param_map["batch_size"] = str(self.cfg["batch_size"])
         param_map["input_size"] = str(self.cfg["input_size"])
@@ -169,13 +169,13 @@ class TrainDetectron2InstanceSegmentation(dnntrain.TrainProcess):
             cfg.OUTPUT_DIR = out_dir
 
         else:
-            if os.path.isfile(param.cfg["config"]):
-                with open(param.cfg["config"], 'r') as file:
+            if os.path.isfile(param.cfg["config_file"]):
+                with open(param.cfg["config_file"], 'r') as file:
                     cfg_data = file.read()
                     cfg = CfgNode.load_cfg(cfg_data)
                     out_dir = cfg.OUTPUT_DIR
             else:
-                print("Unable to load config file {}".format(param.cfg["config"]))
+                print("Unable to load config file {}".format(param.cfg["config_file"]))
                 self.end_task_run()
 
         os.makedirs(out_dir, exist_ok=True)

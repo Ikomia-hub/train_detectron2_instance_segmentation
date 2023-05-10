@@ -89,7 +89,7 @@ class TrainDetectron2InstanceSegmentationWidget(core.CWorkflowTaskWidget):
                                                        self.parameters.cfg["use_custom_cfg"])
 
         self.browse_custom_cfg = pyqtutils.append_browse_file(self.gridLayout, "Custom config path",
-                                                              self.parameters.cfg["config"])
+                                                              self.parameters.cfg["config_file"])
         # Disable unused widgets when custom config checkbox is checked
         self.browse_custom_cfg.setEnabled(self.check_custom_cfg.isChecked())
         self.slider_split.setEnabled(not self.check_custom_cfg.isChecked())
@@ -127,7 +127,7 @@ class TrainDetectron2InstanceSegmentationWidget(core.CWorkflowTaskWidget):
         # Example : self.parameters.windowSize = self.spinWindowSize.value()
         self.parameters.cfg["model_name"] = self.combo_model.currentText()
         self.parameters.cfg["use_custom_cfg"] = self.check_custom_cfg.isChecked()
-        self.parameters.cfg["config"] = self.browse_custom_cfg.path
+        self.parameters.cfg["config_file"] = self.browse_custom_cfg.path
         self.parameters.cfg["max_iter"] = self.spin_max_iter.value()
         self.parameters.cfg["batch_size"] = self.spin_batch_size.value()
         self.parameters.cfg["input_size"] = self.spin_input_size.value()
