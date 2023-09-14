@@ -1,17 +1,17 @@
 <div align="center">
   <img src="images/icon.png" alt="Algorithm icon">
-  <h1 align="center">_algorithm_name_</h1>
+  <h1 align="center">train_detectron2_instance_segmentation</h1>
 </div>
 <br />
 <p align="center">
-    <a href="https://github.com/Ikomia-hub/_algorithm_name_">
-        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/_algorithm_name_">
+    <a href="https://github.com/Ikomia-hub/train_detectron2_instance_segmentation">
+        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/train_detectron2_instance_segmentation">
     </a>
     <a href="https://app.ikomia.ai/hub/">
         <img alt="Website" src="https://img.shields.io/website/http/app.ikomia.ai/en.svg?down_color=red&down_message=offline&up_message=online">
     </a>
-    <a href="https://github.com/Ikomia-hub/_algorithm_name_/blob/main/LICENSE.md">
-        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/_algorithm_name_.svg?color=blue">
+    <a href="https://github.com/Ikomia-hub/train_detectron2_instance_segmentation/blob/main/LICENSE.md">
+        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/train_detectron2_instance_segmentation.svg?color=blue">
     </a>    
     <br>
     <a href="https://discord.com/invite/82Tnw9UGGc">
@@ -19,10 +19,12 @@
     </a> 
 </p>
 
-[Put algorithm description here]
 
-[Insert illustrative image here. Image must be accessible publicly, in algorithm Github repository for example.
-<img src="images/illustration.png"  alt="Illustrative image" width="30%" height="30%">]
+Train your custom Detectron2 instance segmentation models.
+
+![inst seg illustration](https://gilberttanner.com/content/images/2020/08/image_segmentation.png)
+
+
 
 ## :rocket: Use with Ikomia API
 
@@ -36,20 +38,26 @@ pip install ikomia
 
 #### 2. Create your workflow
 
-[Change the sample image URL to fit algorithm purpose]
-
 ```python
-import ikomia
 from ikomia.dataprocess.workflow import Workflow
 
 # Init your workflow
-wf = Workflow()
+wf = Workflow()    
 
-# Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
+# Add dataset loader
+coco = wf.add_task(name="dataset_coco")
 
-# Run on your image  
-wf.run_on(url="example_image.png")
+coco.set_parameters({
+    "json_file": "path/to/annotation/file.json",
+    "image_folder": "path/to/image/folder",
+    "task": "instance_segmentation",
+}) 
+
+# Add training algorithm 
+train = wf.add_task(name="train_detectron2_instance_segmentation", auto_connect=True)
+
+# Launch your training on your data
+wf.run()
 ```
 
 ## :sunny: Use with Ikomia Studio
@@ -62,56 +70,62 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 ## :pencil: Set algorithm parameters
 
-[Explain each algorithm parameters]
+- **model_name** (str) - default 'COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x': Name of the pre-trained model. Additional model available:
+    - COCO-InstanceSegmentation\mask_rcnn_R_101_C4_3x
+    - COCO-InstanceSegmentation\mask_rcnn_R_101_DC5_3x
+    - COCO-InstanceSegmentation\mask_rcnn_R_101_FPN_3x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_C4_1x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_C4_3x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_DC5_1x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_DC5_3x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_FPN_1x
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_FPN_1x_giou
+    - COCO-InstanceSegmentation\mask_rcnn_R_50_FPN_3x
+    - COCO-InstanceSegmentation\mask_rcnn_X_101_32x8d_FPN_3x
+    - LVISv0.5-InstanceSegmentation\mask_rcnn_R_101_FPN_1x
+    - LVISv0.5-InstanceSegmentation\mask_rcnn_R_50_FPN_1x
+    - LVISv0.5-InstanceSegmentation\mask_rcnn_X_101_32x8d_FPN_1x
+    - LVISv1-InstanceSegmentation\mask_rcnn_R_101_FPN_1x
+    - LVISv1-InstanceSegmentation\mask_rcnn_R_50_FPN_1x
+    - LVISv1-InstanceSegmentation\mask_rcnn_X_101_32x8d_FPN_1x
 
-[Change the sample image URL to fit algorithm purpose]
+- **max_iter** (int) - default '100': Maximum number of iterations. 
+- **batch_size** (int) - default '2': Number of samples processed before the model is updated.
+- **input_size** (int) - default '400': Size of the input image.
+- **output_folder** (str, *optional*): path to where the model will be saved. 
+- **learning_rate** (float) - default '0.0025': Step size at which the model's parameters are updated during training.
+- **eval_period** (int) - default '50': Interval between evalutions.  
+- **dataset_split_ratio** (float) – default '0.8' ]0, 1[: Divide the dataset into train and evaluation sets.
+- **config_file**(str, *optional*): Path to config file. 
+
+**Parameters** should be in **strings format**  when added to the dictionary.
+
 
 ```python
-import ikomia
 from ikomia.dataprocess.workflow import Workflow
 
 # Init your workflow
-wf = Workflow()
+wf = Workflow()    
 
-# Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
+# Add dataset loader
+coco = wf.add_task(name="dataset_coco")
 
-algo.set_parameters({
-    "param1": "value1",
-    "param2": "value2",
-    ...
-})
+coco.set_parameters({
+    "json_file": "path/to/annotation/file.json",
+    "image_folder": "path/to/image/folder",
+    "task": "instance_segmentation",
+}) 
 
-# Run on your image  
-wf.run_on(url="example_image.png")
+# Add training algorithm 
+train = wf.add_task(name="train_detectron2_instance_segmentation", auto_connect=True)
+train.set_parameters({
+    "model_name": "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x",
+    "batch_size": "2",
+    "input_size": "400",
+    "learning_rate": "0.0025",
+    "dataset_split_ratio": "0.8",
+}) 
 
+# Launch your training on your data
+wf.run()
 ```
-
-## :mag: Explore algorithm outputs
-
-Every algorithm produces specific outputs, yet they can be explored them the same way using the Ikomia API. For a more in-depth understanding of managing algorithm outputs, please refer to the [documentation](https://ikomia-dev.github.io/python-api-documentation/advanced_guide/IO_management.html).
-
-```python
-import ikomia
-from ikomia.dataprocess.workflow import Workflow
-
-# Init your workflow
-wf = Workflow()
-
-# Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
-
-# Run on your image  
-wf.run_on(url="example_image.png")
-
-# Iterate over outputs
-for output in algo.get_outputs()
-    # Print information
-    print(output)
-    # Export it to JSON
-    output.to_json()
-```
-
-## :fast_forward: Advanced usage 
-
-[optional]
